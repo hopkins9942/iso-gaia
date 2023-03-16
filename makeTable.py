@@ -22,7 +22,8 @@ print(table)
 print(len(table))
 print(table[1]['mh'] is ma.masked)
 
-with open('data.pickle','wb') as f:
+with open('../data/data.pickle','wb') as f:
     pickle.dump(table, f)
 
 # table.write('data.dat', format='ascii', overwrite=True)
+# table is human readable but pckle keeps units

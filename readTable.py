@@ -14,7 +14,7 @@ from astropy.coordinates import SkyCoord
 
 
 # table= Table.read('data.dat', format='ascii')
-with open('data.pickle', 'rb') as f:
+with open('../data/data.pickle', 'rb') as f:
     table = pickle.load(f)
 
 
@@ -43,23 +43,33 @@ astrometryICRS = coord.SkyCoord(ra=table['ra'],
 #units in table?
 print(astrometryICRS)
 
-astrometryLSR = astrometryICRS.transform_to(coord.LSR)
-print(astrometryLSR)
+print(astrometryICRS.velocity)
+#astrometryLSR = astrometryICRS.transform_to(coord.LSR)
+#print(astrometryLSR)
 
 # print(coord.Galactocentric.galcen_v_sun)
 
-# v = np.sqrt(astrometryGC.v_x**2 + astrometryGC.v_y**2 + astrometryGC.v_z**2)
+vels = astrometryICRS.velocity
 
-# fig,ax = plt.subplots()
-# ax.hist(v[lowMH], bins=50, alpha=0.5, label='lowMH')
-# ax.hist(v[highMH], bins=50, alpha=0.5, label='highMH')
-# ax.set_xlabel('Radial Velocity / km/s')
+absv = np.sqrt(vels.d_x**2 + vels.d_y**2 + vels.d_z**2)
+
+fig,ax = plt.subplots()
+ax.hist(absv[lowMH], bins=50, alpha=0.5, label='lowMH')
+ax.hist(absv[highMH], bins=50, alpha=0.5, label='highMH')
+ax.set_xlabel(r'speed/ km/s')
+ax.legend()
+fig.savefig('../speed.png', dpi=300)
+
+theta = np.arcsin(vels.d_z/absv)#.to(u.deg)
+phi = np.arctan2(vels.d_y, vels.d_x)#.to(u.deg)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='mollweide')
+ax.scatter(phi[lowMH], theta[lowMH], s=0.1, alpha=0.5, label='lowMH')
+ax.scatter(phi[highMH], theta[highMH], s=0.1, alpha=0.5, label='highMH')
 # ax.legend()
+ax.set_xlabel(r'$l$')
+ax.set_ylabel(r'$b$')
+fig.savefig('../angle.png', dpi=300)
 
-# theta = np.arccos(astrometryGC.v_z/v)
-# phi = np.arctan2(astrometryGC.v_y, astrometryGC.v_x)
 
-# fig,ax = plt.subplots()
-# ax.scatter(phi[lowMH], theta[lowMH], s=0.1, label='lowMH')
-# ax.scatter(phi[highMH], theta[highMH], s=0.1,  label='highMH')
-# ax.legend()
