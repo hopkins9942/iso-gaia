@@ -9,13 +9,9 @@ from astroquery.gaia import Gaia
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
-<<<<<<< HEAD
+
 os.environ['SSL_CERT_FILE'] = '/Users/hopkinsm/GAIA/gaiaEnv/lib/python3.10/site-packages/certifi/cacert.pem'
-# line needed for querying
-=======
-# os.environ['SSL_CERT_FILE'] = '/Users/hopkinsm/GAIA/gaiaEnv/lib/python3.10/site-packages/certifi/cacert.pem'
 # line needed for querying on mac
->>>>>>> b857449c9ffa48af2f3ec2b1f1c672a797ee4579
 
 # coord = SkyCoord(ra=280, dec=-60, unit=(u.degree, u.degree), frame='icrs')
 # width = u.Quantity(0.1, u.deg)
