@@ -58,7 +58,7 @@ ax.hist(absv[lowMH], bins=50, alpha=0.5, label='lowMH')
 ax.hist(absv[highMH], bins=50, alpha=0.5, label='highMH')
 ax.set_xlabel(r'speed/ km/s')
 ax.legend()
-fig.savefig('../speed.png', dpi=300)
+fig.savefig('../plots/speed.png', dpi=300)
 
 theta = np.arcsin(vels.d_z/absv)#.to(u.deg)
 phi = np.arctan2(vels.d_y, vels.d_x)#.to(u.deg)
@@ -67,9 +67,19 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='mollweide')
 ax.scatter(phi[lowMH], theta[lowMH], s=0.1, alpha=0.5, label='lowMH')
 ax.scatter(phi[highMH], theta[highMH], s=0.1, alpha=0.5, label='highMH')
-# ax.legend()
+ax.set_xticklabels([])
+ax.set_yticklabels([])
 ax.set_xlabel(r'$l$')
 ax.set_ylabel(r'$b$')
-fig.savefig('../angle.png', dpi=300)
+fig.savefig('../plots/angle.png', dpi=300)
+
+
+
+# MH distribution
+
+fig,ax = plt.subplots()
+ax.hist(table['mh'], bins=50)
+ax.set_xlabel('[M/H]')
+fig.savefig('../plots/MH.png', dpi=300)
 
 
