@@ -1,4 +1,5 @@
 import time
+import os
 import numpy as np
 from numpy import ma 
 from astroquery.gaia import Gaia
