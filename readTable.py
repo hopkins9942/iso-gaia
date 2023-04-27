@@ -127,8 +127,8 @@ def velPlots(sc, frame, proj='mollweide'):
     
     vels = sc.transform_to(frame).velocity
     absv = np.sqrt(vels.d_x**2 + vels.d_y**2 + vels.d_z**2)
-    theta = np.arcsin(vels.d_z/absv).to(u.deg)
-    phi = np.arctan2(vels.d_y, vels.d_x).to(u.deg)
+    theta = np.arcsin(vels.d_z/absv)#.to(u.deg)
+    phi = np.arctan2(vels.d_y, vels.d_x)#.to(u.deg)
     
     fig = plt.figure()
     ax = fig.add_subplot(projection=proj)
@@ -168,8 +168,8 @@ def velPlots(sc, frame, proj='mollweide'):
     ax.set_ylabel(r'vz')
     ax.set_title(frame)
 
-for f in ['icrs', 'barycentricmeanecliptic', 'galactic', 'galactocentric', 'galacticlsr', 'lsr']:
-    velPlots(astrometryICRS, f, proj='rectilinear')
+# for f in ['icrs', 'barycentricmeanecliptic', 'galactic', 'galactocentric', 'galacticlsr', 'lsr']:
+#     velPlots(astrometryICRS, f, proj='rectilinear')
     
     
     

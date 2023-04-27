@@ -30,3 +30,4 @@ with open('../data/data.pickle','wb') as f:
 
 table.write('../data/data.txt', format='ascii', overwrite=True)
 # table is human readable but pckle keeps units
+# What units??
