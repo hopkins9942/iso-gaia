@@ -76,6 +76,13 @@ fig.savefig('../plots/fH2O.png', dpi=300)
 def angWrap(l):
     return np.where(l>180*u.deg, l-360*u.deg, l)
 
+def spherical(vels):
+    #there may be way to use differential object itself to do this
+    absv = np.sqrt(vels.d_x**2 + vels.d_y**2 + vels.d_z**2)
+    theta = np.arcsin(vels.d_z/absv)
+    phi = np.arctan2(vels.d_y, vels.d_x)
+    return (absv, theta, phi)
+    
 
 def velGraph(astrometry, frame='galactic', proj='mollweide', label=''):
     """
@@ -86,38 +93,48 @@ def velGraph(astrometry, frame='galactic', proj='mollweide', label=''):
     
     
     vels = astrometry.transform_to(frame).velocity
-    absv = np.sqrt(vels.d_x**2 + vels.d_y**2 + vels.d_z**2)
-    theta = np.arcsin(vels.d_z/absv)
-    phi = np.arctan2(vels.d_y, vels.d_x)
+    # absv = np.sqrt(vels.d_x**2 + vels.d_y**2 + vels.d_z**2)
+    # theta = np.arcsin(vels.d_z/absv)
+    # phi = np.arctan2(vels.d_y, vels.d_x)
+    absv, theta, phi, = spherical(vels)
+    
     
     # projections
     fig, ax = plt.subplots()
-    ax.scatter(vels.d_x, vels.d_y, s=0.1, alpha=0.5, color='black')
+    ax.scatter(vels.d_x, vels.d_y, s=0.01, alpha=0.5, color='black')
     ax.scatter(oumuamua.transform_to(frame).velocity.d_x, 
                oumuamua.transform_to(frame).velocity.d_y, s=1, marker='*', color='hotpink')
     ax.scatter(borisov.transform_to(frame).velocity.d_x, 
                borisov.transform_to(frame).velocity.d_y, s=1, marker='*', color='lime')
-    ax.set_xlim((-150,150))
-    ax.set_ylim((-150,150))
+    ax.set_xlim((-100,100))
+    ax.set_ylim((-100,100))
     ax.set_xlabel(r'vx') 
     ax.set_ylabel(r'vy')
+    ax.set_aspect('equal')
     ax.set_title(frame+label)
     fig.savefig(f'../plots/vxvy_{frame}_{label}.png', dpi=300)
     
     fig, ax = plt.subplots()
-    ax.scatter(vels.d_y, vels.d_z, s=0.1, alpha=0.5, color='black')
-    ax.set_xlim((-150,150))
-    ax.set_ylim((-150,150))
+    ax.scatter(vels.d_y, vels.d_z, s=0.01, alpha=0.5, color='black')
+    ax.scatter(oumuamua.transform_to(frame).velocity.d_y, 
+               oumuamua.transform_to(frame).velocity.d_z, s=1, marker='*', color='hotpink')
+    ax.scatter(borisov.transform_to(frame).velocity.d_y, 
+               borisov.transform_to(frame).velocity.d_z, s=1, marker='*', color='lime')
+    ax.set_xlim((-100,100))
+    ax.set_ylim((-30,30))
     ax.set_xlabel(r'vy') 
     ax.set_ylabel(r'vz')
     ax.set_title(frame+label)
     fig.savefig(f'../plots/vyvz_{frame}_{label}.png', dpi=300)
     
     fig, ax = plt.subplots()
-    ax.scatter(vels.d_x, vels.d_z, s=0.1, alpha=0.5, color='black')
-    # ax.legend()
-    ax.set_xlim((-150,150))
-    ax.set_ylim((-150,150))
+    ax.scatter(vels.d_x, vels.d_z, s=0.01, alpha=0.5, color='black')
+    ax.scatter(oumuamua.transform_to(frame).velocity.d_x, 
+               oumuamua.transform_to(frame).velocity.d_z, s=1, marker='*', color='hotpink')
+    ax.scatter(borisov.transform_to(frame).velocity.d_x, 
+               borisov.transform_to(frame).velocity.d_z, s=1, marker='*', color='lime')
+    ax.set_xlim((-100,100))
+    ax.set_ylim((-30,30))
     ax.set_xlabel(r'vx') 
     ax.set_ylabel(r'vz')
     ax.set_title(frame+label)
@@ -127,19 +144,26 @@ def velGraph(astrometry, frame='galactic', proj='mollweide', label=''):
     # on-sky
     fig = plt.figure()
     ax = fig.add_subplot(projection=proj)
-    ax.scatter(phi, theta, s=0.1, alpha=0.5, color='grey')
-    lineS = 0.5
-    if (frame=='galactic')or(frame=='galacticlsr'):
-        ax.scatter(angWrap(equator.galactic.l).to(u.rad), equator.galactic.b.to(u.rad), s=lineS, color='hotpink')
-        ax.scatter(angWrap(ecliptic.galactic.l).to(u.rad), ecliptic.galactic.b.to(u.rad), s=lineS, color='lime')
-    if (frame=='icrs')or(frame=='lsr'):
-        ax.scatter(angWrap(ecliptic.icrs.ra).to(u.rad), ecliptic.icrs.dec.to(u.rad), s=lineS, color='lime')
-        ax.scatter(angWrap(galEarthPlane.icrs.ra).to(u.rad), galEarthPlane.icrs.dec.to(u.rad), s=lineS, color='cyan')
-    if frame=='barycentricmeanecliptic':
-        ax.scatter(angWrap(equator.barycentricmeanecliptic.lon).to(u.rad), equator.barycentricmeanecliptic.lat.to(u.rad), s=lineS, color='hotpink')
-        ax.scatter(angWrap(galEarthPlane.barycentricmeanecliptic.lon).to(u.rad), galEarthPlane.barycentricmeanecliptic.lat.to(u.rad), s=lineS, color='cyan')
+    ax.scatter(phi.to(u.deg), theta.to(u.deg), s=0.01, alpha=0.5, color='black')
+    # lineS = 0.5
+    # if (frame=='galactic')or(frame=='galacticlsr'):
+    #     ax.scatter(angWrap(equator.galactic.l).to(u.rad), equator.galactic.b.to(u.rad), s=lineS, color='hotpink')
+    #     ax.scatter(angWrap(ecliptic.galactic.l).to(u.rad), ecliptic.galactic.b.to(u.rad), s=lineS, color='lime')
+    # if (frame=='icrs')or(frame=='lsr'):
+    #     ax.scatter(angWrap(ecliptic.icrs.ra).to(u.rad), ecliptic.icrs.dec.to(u.rad), s=lineS, color='lime')
+    #     ax.scatter(angWrap(galEarthPlane.icrs.ra).to(u.rad), galEarthPlane.icrs.dec.to(u.rad), s=lineS, color='cyan')
+    # if frame=='barycentricmeanecliptic':
+    #     ax.scatter(angWrap(equator.barycentricmeanecliptic.lon).to(u.rad), equator.barycentricmeanecliptic.lat.to(u.rad), s=lineS, color='hotpink')
+    #     ax.scatter(angWrap(galEarthPlane.barycentricmeanecliptic.lon).to(u.rad), galEarthPlane.barycentricmeanecliptic.lat.to(u.rad), s=lineS, color='cyan')
+    ax.scatter(spherical(oumuamua.transform_to(frame).velocity)[2].to(u.deg), 
+               spherical(oumuamua.transform_to(frame).velocity)[1].to(u.deg), s=1, marker='*', color='hotpink')
+    ax.scatter(spherical(borisov.transform_to(frame).velocity)[2].to(u.deg), 
+               spherical(borisov.transform_to(frame).velocity)[1].to(u.deg), s=1, marker='*', color='lime')
     ax.set_xlabel(r'$\phi$')
     ax.set_ylabel(r'$\theta$')
+    ax.set_xlim(180, -180)
+    ax.set_ylim(-90, 90)
+    # can't reverse axes of mollweide, try cartopy
     ax.set_title(frame+label)
     fig.savefig(f'../plots/onsky_{frame}_{label}.png', dpi=300)
     
@@ -154,13 +178,17 @@ def velGraph(astrometry, frame='galactic', proj='mollweide', label=''):
     
 
 if __name__=='__main__':
-    binEdges = np.array([cmp.FeHLow+0.0001, cmp.compInv(0.3), cmp.FeHHigh-0.0001])
-    labels = ['low', 'midlow', 'midhigh', 'high'][::-1]
+    # binEdges = np.array([cmp.FeHLow+0.0001, cmp.compInv(0.3), cmp.FeHHigh-0.0001])
+    # labels = ['low', 'midlow', 'midhigh', 'high'][::-1]
+    
+    binEdges = np.array([0])
+    labels = ['subsolar', 'supersolar']
+    
     bindex = np.digitize(MH, binEdges) # index of mh bin
-    frameNames = ['icrs', 'barycentricmeanecliptic', 'galactic']
+    frameNames = ['galactic', 'galacticlsr', 'galactocentric']
     for i in range(len(binEdges)+1):
         for f in frameNames:
-            velGraph(astrometry[bindex==i], frame=f, label=labels[i])
+            velGraph(astrometry[bindex==i], frame=f, label=labels[i], proj='rectilinear')
 
 
 
