@@ -20,11 +20,11 @@ os.environ['SSL_CERT_FILE'] = '/Users/hopkinsm/GAIA/gaiaEnv/lib/python3.10/site-
 
 
 
-tableNames = Gaia.load_tables(only_names=True)
-for t in tableNames:
-    if 'gcns' in t.get_qualified_name():
-     # print(t.get_qualified_name())
-     pass
+# tableNames = Gaia.load_tables(only_names=True)
+# for t in tableNames:
+#     if 'gcns' in t.get_qualified_name():
+#         print(t.get_qualified_name())
+#         # pass Confirmed gcns was in edr3 - weirdly couldn't find it last time
  
 
 # job1 = Gaia.launch_job_async('SELECT source_id FROM gaiadr3.gaia_source_lite WHERE parallax>50')
