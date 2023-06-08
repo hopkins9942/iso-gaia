@@ -200,4 +200,7 @@ by advice on gaia website calculaions in query are slow, could get all data and 
 
 OR do each bin as a seprate quesry! could deal with n=0 bug while I'm at it
 at 100 minutes, hasn't timed out, but last timefailed at 60ish. Unsure what's going wrong, but splitting it up will help
+
+I think I can avoid changing package more by looping outside, so try that.
+Also investigate where sow is - it may be join itself, so could be quicker
 """
