@@ -36,8 +36,15 @@ OR join is slow but clever, so doesn't occur when not needed
 A sign of this would be 1==3 and 2==4, and  in the times of 7-10, which dont do any calculations
 but use/dont use ligte and d/dont use mh
 
+Results:
+    first querys are always slower - more representative? what makes later onesfaster?
+unclear but I don't think it's cached locally
+restanting computer doesn't reset it, later queries are also fast and 
+changing query slightly doesn't reset it so there must be some element saved o make it fast
 
+Alternatively, give up trying to understand and just try the query I want one bin at a time'
 
+"tuns out, can't get precaculated colour in source_lite"
 """
 
 temp0 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL',1.0,0.0))
@@ -50,7 +57,7 @@ query1 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NU
 #defalt
 
 query2 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL',1.0,0.0))
- FROM gaiadr3.gaia_source_lite WHERE phot_g_mean_mag<12 and parallax>5"""
+ FROM gaiadr3.gaia_source_lite WHERE phot_g_mean_mag<12 and parallax>5.1"""
 #source_lite
 
 query3 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL',1.0,0.0))
@@ -59,8 +66,8 @@ query3 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NU
 #join but dont use and in selection
 
 query4 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL',1.0,0.0))
- FROM gaiadr3.gaia_source_lite WHERE JOIN gaiadr3.astrophysical_parameters USING (source_id)
- phot_g_mean_mag<12 and parallax>5"""
+FROM gaiadr3.gaia_source_lite JOIN gaiadr3.astrophysical_parameters USING (source_id)
+WHERE phot_g_mean_mag<12 and parallax>5"""
 #join with lite but dont use and in selection      
 
 query5 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL AND mh_gspspec IS NOT NULL',1.0,0.0))
@@ -69,8 +76,8 @@ query5 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NU
 #join, use and in selection
 
 query6 = """SELECT source_id, to_integer(IF_THEN_ELSE('radial_velocity IS NOT NULL AND mh_gspspec IS NOT NULL',1.0,0.0))
- FROM gaiadr3.gaia_source_lite WHERE JOIN gaiadr3.astrophysical_parameters USING (source_id)
- phot_g_mean_mag<12 and parallax>5"""
+ FROM gaiadr3.gaia_source_lite JOIN gaiadr3.astrophysical_parameters USING (source_id)
+WHERE phot_g_mean_mag<12 and parallax>5"""
 #join with lite, use and in selection     
 
 query7 = """SELECT source_id, radial_velocity
@@ -79,8 +86,8 @@ query7 = """SELECT source_id, radial_velocity
 #join but dont use and in selection and doesnt do any calculations
 
 query8 = """SELECT source_id, radial_velocity
- FROM gaiadr3.gaia_source_lite WHERE JOIN gaiadr3.astrophysical_parameters USING (source_id)
- phot_g_mean_mag<12 and parallax>5"""
+ FROM gaiadr3.gaia_source_lite JOIN gaiadr3.astrophysical_parameters USING (source_id)
+WHERE phot_g_mean_mag<12 and parallax>5"""
 #join with lite but dont use and doesnt do any calculations
 
 query9 = """SELECT source_id, radial_velocity, mh_gspspec
@@ -89,19 +96,20 @@ query9 = """SELECT source_id, radial_velocity, mh_gspspec
 #join but does use and in selection and doesnt do any calculations
 
 query10 = """SELECT source_id, radial_velocity, mh_gspspec
- FROM gaiadr3.gaia_source_lite WHERE JOIN gaiadr3.astrophysical_parameters USING (source_id)
- phot_g_mean_mag<12 and parallax>5"""
+ FROM gaiadr3.gaia_source_lite  JOIN gaiadr3.astrophysical_parameters USING (source_id)
+WHERE phot_g_mean_mag<12 and parallax>5"""
 #join with lite but does use and doesnt do any calculations
 
 
-query = temp0
+query = query9
 print(query)
 
-t1 = time.time()
-job = Gaia.launch_job_async(query)
-t2 = time.time()
+t0 = time.time()
+ts = [t0]
+for i in range(1):
+    job = Gaia.launch_job_async(query, verbose=True)
+    ts.append(time.time())
     
-table = job.get_results()
-print(table)
-print('N = ', len(table))
-print(f'time = {t2-t1} seconds')
+    table = job.get_results()
+    print('N = ', len(table))
+    print(f'time = {ts[-1]-ts[-2]} seconds')

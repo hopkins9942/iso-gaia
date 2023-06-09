@@ -12,7 +12,6 @@ from gaiaunlimited import fetch_utils, utils, DR3SelectionFunctionTCG, subsample
 
 
 from gaiaunlimited.utils import get_healpix_centers
-import healpy as hp
 #order these
 
 assert Gaia.MAIN_GAIA_TABLE=='gaiadr3.gaia_source'
@@ -111,14 +110,14 @@ try:
     #                 file_name = fname, hplevel_and_binning = inDict,
     #                 use_astrophysical_parameters=False)
     
-    print('run2')
-    inDict = {'healpix': 4,'phot_g_mean_mag': [3,20,0.2],'g_rp': [-2.5,5.1,0.4]}
-    fname = 'hp4_docsRange_rv_mh'
-    ssquery = "radial_velocity IS NOT NULL AND mh_gspspec IS NOT NULL"
+    print('test')
+    inDict = {'healpix': 4,'phot_g_mean_mag': [10,10.6,0.2],'g_rp': [-0.4,0.4,0.4]}
+    fname = 'test'
+    ssquery = "radial_velocity IS NOT NULL"
     subsampleSF = subsample.SubsampleSelectionFunction(
                     subsample_query = ssquery,
                     file_name = fname, hplevel_and_binning = inDict,
-                    use_astrophysical_parameters=True)
+                    use_astrophysical_parameters=False)
     
     # print('run3')
     # rvssf = subsample.DR3RVSSelectionFunction()
