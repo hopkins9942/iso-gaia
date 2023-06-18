@@ -202,4 +202,6 @@ at 100 minutes, hasn't timed out, but last timefailed at 60ish. Unsure what's go
 
 I think I can avoid changing package more by looping outside, so try that.
 Also investigate where sow is - it may be join itself, so could be quicker
+
+try timing two attempts over small number of well filled bins ,with JOIN before and after SELECT
 """
