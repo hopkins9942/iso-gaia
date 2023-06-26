@@ -19,23 +19,11 @@ print('n loaded')
 print(k_df)
 print(n_df)
 
-# print('looking for oddities')
-# for tempdf in [k_df,n_df]:
-#     print(tempdf.healpix_.min())
-#     print(tempdf.healpix_.max())
-#     print(tempdf.phot_g_mean_mag_.min())
-#     print(tempdf.phot_g_mean_mag_.max())
-#     print(tempdf.g_rp_.min())
-#     print(tempdf.g_rp_.max())
+# averaging over sky - assumes uniform distribution over sky, fine for 200pc for now
 
-# print('removing oddities')
-# k_df = k_df[k_df.g_rp_!=18.0]
-# n_df = n_df[n_df.g_rp_!=18.0]
+# shape = (hp.order2npix(4), 85, 19) 
+shape = (85, 19) 
 
-# assert len(k_df)==255200
-# assert len(n_df)==1047689 - 6008
-
-shape = (hp.order2npix(4), 85, 19) 
 print(shape)
 n_col = np.zeros(np.prod(shape))
 k_col = np.zeros(np.prod(shape))
@@ -44,37 +32,46 @@ k_col = np.zeros(np.prod(shape))
 print('starting k scan')
 for i, row in k_df.iterrows():
     hpi, gi, ci, k = row
-    index = np.ravel_multi_index((int(hpi),int(gi),int(ci)), shape)
-    k_col[index] = k
+    # index = np.ravel_multi_index((int(hpi),int(gi),int(ci)), shape)
+    index = np.ravel_multi_index((int(gi), int(ci)), shape)
+    # k_col[index] = k
+    k_col[index] += k
     
 print('starting n scan')
 for i, row in n_df.iterrows():
     hpi, gi, ci, n = row
-    index = np.ravel_multi_index((int(hpi),int(gi),int(ci)), shape)
-    n_col[index] = n
+    index = np.ravel_multi_index((int(gi),int(ci)), shape)
+    n_col[index] += n
 
 print('finished scan')
-hpi_col, gi_col, ci_col = np.unravel_index(np.arange(np.prod(shape)), shape)
+# hpi_col, gi_col, ci_col = np.unravel_index(np.arange(np.prod(shape)), shape)
+gi_col, ci_col = np.unravel_index(np.arange(np.prod(shape)), shape)
 
-datadict = {'healpix_':hpi_col,
+datadict = {
+    # 'healpix_':hpi_col,
             'phot_g_mean_mag_':gi_col,
             'g_rp_':ci_col,
             'n':n_col,
-            'k':k_col}
+            'k':k_col,
+            'p':(k_col+1)/(n_col+2)} # for when I am uing file directly
 
 print('making nk_df')
-nk_df = pd.DataFrame(datadict)
+nkp_df = pd.DataFrame(datadict)
 
-hplevel_and_binning = {'healpix': 4,'phot_g_mean_mag': (3,20,0.2), 'g_rp': (-2.5,5.1,0.4)}
+with open('/home/hopkinsl/GAIA/data/sssf.csv', "w") as f:
+    nkp_df.to_csv(f, index = False)
 
-print('writing')
-with open('/home/hopkinsl/.gaiaunlimited/hp4_docsRange_rv_mh_age_fixed.csv', "w") as f:
-    f.write(f"#{hplevel_and_binning}\n")
-    nk_df.to_csv(f, index = False)
 
-print('done!')
-# sssf_array = (k_array+1)/(n_array+2)
-# var_array = sssf_array*(n_array-k_array+1)/((n_array+2)*(n_array+3))
+# hplevel_and_binning = {'phot_g_mean_mag': (3,20,0.2), 'g_rp': (-2.5,5.1,0.4)}
+
+# print('writing')
+# with open('/home/hopkinsl/.gaiaunlimited/avrg_docsRange_rv_mh_age_fixed.csv', "w") as f:
+#     f.write(f"#{hplevel_and_binning}\n")
+#     nk_df.to_csv(f, index = False)
+
+# print('done!')
+# # sssf_array = (k_array+1)/(n_array+2)
+# # var_array = sssf_array*(n_array-k_array+1)/((n_array+2)*(n_array+3))
 
 
 
