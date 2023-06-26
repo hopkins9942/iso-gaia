@@ -1,3 +1,4 @@
+import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,14 +15,14 @@ import myIsochrones
 
 sssf = pd.read_csv('/home/hopkinsl/GAIA/data/sssf.csv', comment="#")
 
-print(sssf)
+# print(sssf)
 ss_shape = (85,19)
 sssf_array = np.zeros(ss_shape)
 for index, vals in sssf.iterrows():
     g_i, c_i, n, k, p = vals
-    if n>=5: 
+    if n>=10: 
         sssf_array[int(g_i), int(c_i)] = p #finally in a form I'm used to using
-print(sssf_array)
+# print(sssf_array)
 
 fig,ax = plt.subplots()
 ax.imshow(sssf_array.T, origin='lower')
@@ -69,8 +70,17 @@ for i in range(len(MH_logAge)):
 assert np.count_nonzero(esf_array==0) == 0 # yeah boiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 
 fig,ax = plt.subplots()
-ax.imshow(esf_array[5,:,:].T, origin='lower')
-#hmm
+image = ax.imshow(esf_array[1,:,:].T, origin='lower')
+fig.colorbar(image)
+#it's aliiiiiive
+print(np.log10(np.max(esf_array)/np.min(esf_array)))
+
+with open('/home/hopkinsl/GAIA/data/esf.pickle', 'wb') as f:
+    pickle.dump(esf_array, f)
+
+#esf_array has large dynamic range - 0.1 to 4e-8
+#but can be scaled by any value 
+# esf_array = esf_array/np.max(esf_array)
 
 # print(MH_logAge)
 # print(indx)
